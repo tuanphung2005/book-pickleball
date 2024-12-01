@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFutbol, faMapMarkerAlt, faStar, faTableTennis, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faFutbol, faMapMarkerAlt, faStar, faTableTennis, faTimes, faBasketball } from '@fortawesome/free-solid-svg-icons';
 import { Playground } from '../types/playground';
 
 interface PlaygroundDetailProps {
@@ -8,8 +8,17 @@ interface PlaygroundDetailProps {
 }
 
 export const PlaygroundDetail = ({ playground, onClose }: PlaygroundDetailProps) => {
-  const getTypeIcon = (type: 'football' | 'pickleball') => {
-    return type === 'football' ? faFutbol : faTableTennis;
+  const getTypeIcon = (type: 'football' | 'pickleball' | 'badminton' | 'basketball') => {
+    switch(type) {
+      case 'football':
+        return faFutbol;
+      case 'pickleball':
+        return faTableTennis;
+      case 'badminton':
+        return faTableTennis;
+      case 'basketball':
+        return faBasketball;
+    }
   };
 
   return (

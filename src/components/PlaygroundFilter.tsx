@@ -27,6 +27,8 @@ export const PlaygroundFilter = ({
                     <option value="">Loại sân: Tất cả</option>
                     <option value="football">Bóng đá</option>
                     <option value="pickleball">Pickleball</option>
+                    <option value="badminton">Cầu lông</option>
+                    <option value="basketball">Bóng rổ</option>
                 </select>
 
                 <button

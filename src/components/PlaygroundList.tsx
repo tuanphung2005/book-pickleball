@@ -1,6 +1,6 @@
 import { Playground } from '../types/playground';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFutbol, faLocationDot, faStar, faTableTennis } from '@fortawesome/free-solid-svg-icons';
+import { faFutbol, faLocationDot, faStar, faTableTennis, faBasketball } from '@fortawesome/free-solid-svg-icons';
 
 interface PlaygroundListProps {
   playgrounds: Playground[];
@@ -8,8 +8,19 @@ interface PlaygroundListProps {
 }
 
 export const PlaygroundList = ({ playgrounds, onPlaygroundClick }: PlaygroundListProps) => {
-  const getTypeIcon = (type: 'football' | 'pickleball') => {
-    return type === 'football' ? faFutbol : faTableTennis;
+  const getTypeIcon = (type: 'football' | 'pickleball' | 'badminton' | 'basketball') => {
+    switch(type) {
+      case 'football':
+        return faFutbol;
+      case 'pickleball':
+        return faTableTennis;
+      case 'badminton':
+        return faTableTennis; // Using table tennis icon as fallback
+      case 'basketball':
+        return faBasketball;
+      default:
+        return faTableTennis;
+    }
   };
 
   return (
