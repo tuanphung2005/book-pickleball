@@ -3,12 +3,14 @@ import { playgrounds } from './data/playgrounds'
 import { PlaygroundFilter } from './components/PlaygroundFilter'
 import { PlaygroundList } from './components/PlaygroundList'
 import { PlaygroundDetail } from './components/PlaygroundDetail'
+import { BottomBar } from './components/BottomBar'
+import { AuthModal } from './components/AuthModal'
+import { OrderHistory } from './components/OrderHistory' // Add this import
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 
 import { Playground } from './types/playground'
-import { AuthModal } from './components/AuthModal'
 
 function App() {
   const [search, setSearch] = useState('')
@@ -25,6 +27,9 @@ function App() {
 
   const [playgrounds, setPlaygrounds] = useState<Playground[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Add new state
+  const [showOrders, setShowOrders] = useState(false);
 
   // fetch playgrounds
   useEffect(() => {
@@ -82,59 +87,75 @@ function App() {
   });
 
   return (
-    <div className="p-4">
-      <div className='flex m-2 items-center'>
-        <h1 className="text-2xl font-bold mb-4">Tìm sân hoặc quận</h1>
-        {isLoggedIn ? (
-          <div className="ml-auto flex items-center gap-2">
-            <span className="text-gray-600">{userName}</span>
+    <div className="pb-16"> {/* Add padding bottom to prevent content from being hidden */}
+      <div className="p-4">
+        <div className='flex m-2 items-center'>
+          <h1 className="text-2xl font-bold mb-4">Tìm sân hoặc quận</h1>
+          {isLoggedIn ? (
+            <div className="ml-auto flex items-center gap-2">
+              <span className="text-gray-600">{userName}</span>
+              <button 
+                onClick={handleLogout}
+                className="border rounded-lg p-2 hover:bg-gray-100"
+              >
+                <FontAwesomeIcon icon={faRightFromBracket} />
+              </button>
+            </div>
+          ) : (
             <button 
-              onClick={handleLogout}
-              className="border rounded-lg p-2 hover:bg-gray-100"
+              onClick={() => setShowAuthModal(true)} 
+              className="ml-auto border rounded-lg p-2"
             >
-              <FontAwesomeIcon icon={faRightFromBracket} />
+              Đăng nhập
             </button>
-          </div>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Tìm sân"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border p-2 w-full rounded-lg"
+          />
+        </div>
+        
+        {!showOrders ? (
+          <>
+            <PlaygroundFilter 
+              filterType={filterType} 
+              setFilterType={setFilterType}
+              rating={rating}
+              onRatingChange={handleRatingChange}
+              activeFilter={activeFilter}
+            />
+            <PlaygroundList 
+              playgrounds={sortedPlaygrounds} 
+              onPlaygroundClick={setSelectedPlayground}
+            />
+          </>
         ) : (
-          <button 
-            onClick={() => setShowAuthModal(true)} 
-            className="ml-auto border rounded-lg p-2"
-          >
-            Đăng nhập
-          </button>
+          <OrderHistory />
+        )}
+        
+        <BottomBar 
+          onHomeClick={() => setShowOrders(false)}
+          onOrdersClick={() => setShowOrders(true)}
+          activeTab={showOrders ? 'orders' : 'home'}
+        />
+
+        {selectedPlayground && (
+          <PlaygroundDetail 
+            playground={selectedPlayground} 
+            onClose={() => setSelectedPlayground(null)}
+            isLoggedIn={isLoggedIn}
+          />
+        )}
+        {showAuthModal && (
+          <AuthModal onClose={() => setShowAuthModal(false)} />
         )}
       </div>
-
-
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Tìm sân"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border p-2 w-full rounded-lg"
-        />
-      </div>
-      <PlaygroundFilter 
-        filterType={filterType} 
-        setFilterType={setFilterType}
-        rating={rating}
-        onRatingChange={handleRatingChange}
-        activeFilter={activeFilter}
-      />
-      <PlaygroundList 
-        playgrounds={sortedPlaygrounds} 
-        onPlaygroundClick={setSelectedPlayground}
-      />
-      {selectedPlayground && (
-        <PlaygroundDetail 
-          playground={selectedPlayground} 
-          onClose={() => setSelectedPlayground(null)}
-        />
-      )}
-      {showAuthModal && (
-        <AuthModal onClose={() => setShowAuthModal(false)} />
-      )}
     </div>
   )
 }

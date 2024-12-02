@@ -5,13 +5,14 @@ const jwt = require('jsonwebtoken');
 const pool = require('./config/db');
 
 const playgroundRoutes = require('./routes/playgrounds');
-
+const bookingRoutes = require('./routes/bookings');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use('/api/playgrounds', playgroundRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Register endpoint
 app.post('/api/register', async (req, res) => {
