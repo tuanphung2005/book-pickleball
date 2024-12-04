@@ -1,13 +1,22 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faReceipt, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faReceipt } from '@fortawesome/free-solid-svg-icons';
 
 interface BottomBarProps {
   onHomeClick: () => void;
   onOrdersClick: () => void;
   activeTab: 'home' | 'orders';
+  isLoggedIn: boolean; // Add this prop
 }
 
-export const BottomBar = ({ onHomeClick, onOrdersClick, activeTab }: BottomBarProps) => {
+export const BottomBar = ({ onHomeClick, onOrdersClick, activeTab, isLoggedIn }: BottomBarProps) => {
+  const handleOrderClick = () => {
+    if (!isLoggedIn) {
+      alert('Vui lòng đăng nhập để xem hóa đơn');
+      return;
+    }
+    onOrdersClick();
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
       <div className="flex justify-around items-center h-16">
@@ -21,8 +30,9 @@ export const BottomBar = ({ onHomeClick, onOrdersClick, activeTab }: BottomBarPr
           <span className="text-xs">Trang chủ</span>
         </button>
         <button 
-          onClick={onOrdersClick}
+          onClick={handleOrderClick}
           className={`flex flex-col items-center justify-center w-full py-2 ${
+            !isLoggedIn ? 'text-gray-400 cursor-not-allowed' : 
             activeTab === 'orders' ? 'text-blue-500' : 'text-gray-500'
           }`}
         >

@@ -1,14 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { playgrounds } from './data/playgrounds'
 import { PlaygroundFilter } from './components/PlaygroundFilter'
 import { PlaygroundList } from './components/PlaygroundList'
 import { PlaygroundDetail } from './components/PlaygroundDetail'
 import { BottomBar } from './components/BottomBar'
 import { AuthModal } from './components/AuthModal'
-import { OrderHistory } from './components/OrderHistory' // Add this import
+import { OrderHistory } from './components/OrderHistory'
+import { PlaygroundForm } from './components/PlaygroundForm';
+import { PlaygroundManager } from './components/PlaygroundManager'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { 
+  faRightFromBracket, 
+  faUser, 
+  faPlus, 
+  faCog,
+  faCaretDown
+} from '@fortawesome/free-solid-svg-icons'
 
 import { Playground } from './types/playground'
 
@@ -30,6 +38,10 @@ function App() {
 
   // Add new state
   const [showOrders, setShowOrders] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [showPlaygroundForm, setShowPlaygroundForm] = useState(false);
+  const [showPlaygroundManager, setShowPlaygroundManager] = useState(false);
 
   // fetch playgrounds
   useEffect(() => {
@@ -56,6 +68,18 @@ function App() {
       const name = localStorage.getItem('userName');
       if (name) setUserName(name);
     }
+  }, []);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -87,19 +111,47 @@ function App() {
   });
 
   return (
-    <div className="pb-16"> {/* Add padding bottom to prevent content from being hidden */}
+    <div className="pb-16">
       <div className="p-4">
         <div className='flex m-2 items-center'>
           <h1 className="text-2xl font-bold mb-4">Tìm sân hoặc quận</h1>
           {isLoggedIn ? (
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-gray-600">{userName}</span>
-              <button 
-                onClick={handleLogout}
-                className="border rounded-lg p-2 hover:bg-gray-100"
+            <div className="ml-auto flex items-center gap-2 relative" ref={menuRef}>
+              <div 
+                className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded-lg"
+                onClick={() => setShowUserMenu(!showUserMenu)}
               >
-                <FontAwesomeIcon icon={faRightFromBracket} />
-              </button>
+                <span className="text-gray-600">{userName}</span>
+                <FontAwesomeIcon icon={faCaretDown} />
+              </div>
+
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-lg py-2 z-50">
+                  <button 
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                    onClick={() => setShowPlaygroundForm(true)}
+                  >
+                    <FontAwesomeIcon icon={faPlus} />
+                    <span>Thêm sân mới</span>
+                  </button>
+                  <button 
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                    onClick={() => setShowPlaygroundManager(true)}
+                  >
+                    <FontAwesomeIcon icon={faCog} />
+                    <span>Quản lý sân</span>
+                  </button>
+                  <hr className="my-2" />
+                  <button 
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600"
+                    onClick={handleLogout}
+                  >
+                    <FontAwesomeIcon icon={faRightFromBracket} />
+                    <span>Đăng xuất</span>
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <button 
@@ -143,6 +195,7 @@ function App() {
           onHomeClick={() => setShowOrders(false)}
           onOrdersClick={() => setShowOrders(true)}
           activeTab={showOrders ? 'orders' : 'home'}
+          isLoggedIn={isLoggedIn}
         />
 
         {selectedPlayground && (
@@ -154,6 +207,12 @@ function App() {
         )}
         {showAuthModal && (
           <AuthModal onClose={() => setShowAuthModal(false)} />
+        )}
+        {showPlaygroundForm && (
+          <PlaygroundForm onClose={() => setShowPlaygroundForm(false)} />
+        )}
+        {showPlaygroundManager && (
+          <PlaygroundManager onClose={() => setShowPlaygroundManager(false)} />
         )}
       </div>
     </div>

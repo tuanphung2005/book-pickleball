@@ -32,13 +32,24 @@ router.post('/', auth, async (req, res) => {
       });
     }
 
-    // Check if timeslot is already booked
+    // Check if timeslot is already booked - Fixed overlap logic
     const [existing] = await pool.execute(
       `SELECT * FROM bookings 
-       WHERE playgroundId = ? AND date = ? 
-       AND ((timeStart <= ? AND timeEnd > ?) OR (timeStart < ? AND timeEnd >= ?))
-       AND status != "cancelled"`,
-      [playgroundId, date, timeEnd, timeStart, timeEnd, timeStart]
+       WHERE playgroundId = ? 
+       AND date = ? 
+       AND status != 'cancelled'
+       AND (
+         (timeStart < ? AND timeEnd > ?) OR    /* New booking starts during existing */
+         (timeStart < ? AND timeEnd > ?) OR    /* New booking ends during existing */
+         (timeStart >= ? AND timeEnd <= ?)     /* Existing booking completely contains new */
+       )`,
+      [
+        playgroundId, 
+        date,
+        timeEnd, timeStart,
+        timeEnd, timeEnd,
+        timeStart, timeEnd       
+      ]
     );
 
     if (existing.length > 0) {

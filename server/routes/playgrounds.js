@@ -13,15 +13,52 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get user's playgrounds
+router.get('/user', auth, async (req, res) => {
+  try {
+    const [playgrounds] = await pool.execute(
+      'SELECT * FROM playgrounds WHERE userId = ?',
+      [req.userId]
+    );
+    res.json(playgrounds);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Add new playground (protected route)
 router.post('/', auth, async (req, res) => {
   try {
     const { name, type, address, imageUrl } = req.body;
+
+    // Validate URL length
+    if (imageUrl.length > 500) {
+      return res.status(400).json({ 
+        error: 'URL hình ảnh quá dài (tối đa 500 ký tự)' 
+      });
+    }
+
+    // Validate URL format
+    try {
+      new URL(imageUrl);
+    } catch (err) {
+      return res.status(400).json({ 
+        error: 'URL hình ảnh không hợp lệ' 
+      });
+    }
+
     const [result] = await pool.execute(
-      'INSERT INTO playgrounds (name, type, address, imageUrl) VALUES (?, ?, ?, ?)',
-      [name, type, address, imageUrl]
+      'INSERT INTO playgrounds (name, type, address, imageUrl, userId) VALUES (?, ?, ?, ?, ?)',
+      [name, type, address, imageUrl, req.userId]
     );
-    res.status(201).json({ id: result.insertId, name, type, address, imageUrl });
+
+    res.status(201).json({ 
+      id: result.insertId, 
+      name, 
+      type, 
+      address, 
+      imageUrl 
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -36,6 +73,60 @@ router.patch('/:id/rating', auth, async (req, res) => {
       [rating, req.params.id]
     );
     res.json({ message: 'Rating updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update playground
+router.patch('/:id', auth, async (req, res) => {
+  try {
+    const { name, type, address, imageUrl } = req.body;
+    
+    // Check if playground belongs to user
+    const [playground] = await pool.execute(
+      'SELECT * FROM playgrounds WHERE id = ? AND userId = ?',
+      [req.params.id, req.userId]
+    );
+
+    if (playground.length === 0) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    await pool.execute(
+      'UPDATE playgrounds SET name = ?, type = ?, address = ?, imageUrl = ? WHERE id = ? AND userId = ?',
+      [name, type, address, imageUrl, req.params.id, req.userId]
+    );
+    
+    res.json({ 
+      message: 'Playground updated successfully',
+      playground: { id: req.params.id, name, type, address, imageUrl }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete playground
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    // First check if playground belongs to user
+    const [playground] = await pool.execute(
+      'SELECT * FROM playgrounds WHERE id = ? AND userId = ?',
+      [req.params.id, req.userId]
+    );
+
+    if (playground.length === 0) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Then delete
+    await pool.execute(
+      'DELETE FROM playgrounds WHERE id = ? AND userId = ?',
+      [req.params.id, req.userId]
+    );
+
+    res.json({ message: 'Playground deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
