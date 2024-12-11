@@ -20,6 +20,24 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Get incoming bookings for playground owner
+router.get('/incoming', auth, async (req, res) => {
+  try {
+    const [bookings] = await pool.execute(
+      `SELECT b.*, p.name as playgroundName, u.name as userName
+       FROM bookings b 
+       JOIN playgrounds p ON b.playgroundId = p.id 
+       JOIN users u ON b.userId = u.id
+       WHERE p.userId = ? AND b.status = 'pending'
+       ORDER BY b.date ASC`,
+      [req.userId]
+    );
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Create new booking
 router.post('/', auth, async (req, res) => {
   try {
@@ -29,6 +47,18 @@ router.post('/', auth, async (req, res) => {
     if (!playgroundId || !date || !timeStart || !timeEnd) {
       return res.status(400).json({ 
         error: 'Missing required fields: playgroundId, date, timeStart, timeEnd' 
+      });
+    }
+
+    // Check if user owns the playground
+    const [playground] = await pool.execute(
+      'SELECT userId FROM playgrounds WHERE id = ?',
+      [playgroundId]
+    );
+
+    if (playground.length > 0 && playground[0].userId === req.userId) {
+      return res.status(400).json({ 
+        error: 'Không thể đặt sân của chính mình' 
       });
     }
 
@@ -70,6 +100,64 @@ router.post('/', auth, async (req, res) => {
       timeEnd,
       status: 'pending'
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Cancel booking
+router.patch('/:id/cancel', auth, async (req, res) => {
+  try {
+    // Check if booking exists and belongs to user
+    const [booking] = await pool.execute(
+      'SELECT * FROM bookings WHERE id = ? AND userId = ?',
+      [req.params.id, req.userId]
+    );
+
+    if (booking.length === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    if (booking[0].status !== 'pending') {
+      return res.status(400).json({ 
+        error: 'Only pending bookings can be cancelled' 
+      });
+    }
+
+    // Update booking status
+    await pool.execute(
+      'UPDATE bookings SET status = "cancelled" WHERE id = ?',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Booking cancelled successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Confirm booking
+router.patch('/:id/confirm', auth, async (req, res) => {
+  try {
+    // Check if playground belongs to user
+    const [booking] = await pool.execute(
+      `SELECT b.*, p.userId as ownerId 
+       FROM bookings b 
+       JOIN playgrounds p ON b.playgroundId = p.id 
+       WHERE b.id = ?`,
+      [req.params.id]
+    );
+
+    if (booking.length === 0 || booking[0].ownerId !== req.userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    await pool.execute(
+      'UPDATE bookings SET status = "confirmed" WHERE id = ?',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Booking confirmed successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
