@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faClock, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { Playground } from '../types/playground';
@@ -13,9 +13,35 @@ export const BookingForm = ({ playground, onClose }: BookingFormProps) => {
   const [timeStart, setTimeStart] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const checkOwnership = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/playgrounds/${playground.id}/owner`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const data = await response.json();
+        if (data.isOwner) {
+          setError('Không thể đặt sân của chính mình');
+        }
+      } catch (err) {
+        console.error('Error checking ownership:', err);
+      }
+    };
+
+    checkOwnership();
+  }, [playground.id]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (error === 'Không thể đặt sân của chính mình') {
+      return;
+    }
 
     try {
       const timeEnd = `${Number(timeStart.split(':')[0]) + 1}:00`; // Calculate end time
@@ -83,6 +109,7 @@ export const BookingForm = ({ playground, onClose }: BookingFormProps) => {
               min={new Date().toISOString().split('T')[0]}
               className="border p-2 w-full rounded-lg"
               required
+              disabled={error === 'Không thể đặt sân của chính mình'}
             />
           </div>
 
@@ -96,6 +123,7 @@ export const BookingForm = ({ playground, onClose }: BookingFormProps) => {
               onChange={(e) => setTimeStart(e.target.value)}
               className="border p-2 w-full rounded-lg"
               required
+              disabled={error === 'Không thể đặt sân của chính mình'}
             >
               <option value="">Chọn giờ</option>
               {timeSlots.map(slot => (
@@ -108,7 +136,12 @@ export const BookingForm = ({ playground, onClose }: BookingFormProps) => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+            className={`w-full bg-blue-500 text-white p-2 rounded-lg ${
+              error === 'Không thể đặt sân của chính mình' 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:bg-blue-600'
+            }`}
+            disabled={error === 'Không thể đặt sân của chính mình'}
           >
             Xác nhận đặt sân
           </button>

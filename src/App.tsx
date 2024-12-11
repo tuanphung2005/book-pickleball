@@ -6,8 +6,9 @@ import { PlaygroundDetail } from './components/PlaygroundDetail'
 import { BottomBar } from './components/BottomBar'
 import { AuthModal } from './components/AuthModal'
 import { OrderHistory } from './components/OrderHistory'
-import { PlaygroundForm } from './components/PlaygroundForm';
+import { PlaygroundForm } from './components/PlaygroundForm'
 import { PlaygroundManager } from './components/PlaygroundManager'
+import { IncomingOrders } from './components/IncomingOrders' // Add this import
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -15,7 +16,8 @@ import {
   faUser, 
   faPlus, 
   faCog,
-  faCaretDown
+  faCaretDown,
+  faClipboardList
 } from '@fortawesome/free-solid-svg-icons'
 
 import { Playground } from './types/playground'
@@ -42,6 +44,7 @@ function App() {
   const menuRef = useRef<HTMLDivElement>(null);
   const [showPlaygroundForm, setShowPlaygroundForm] = useState(false);
   const [showPlaygroundManager, setShowPlaygroundManager] = useState(false);
+  const [showIncomingOrders, setShowIncomingOrders] = useState(false);
 
   // fetch playgrounds
   useEffect(() => {
@@ -125,7 +128,7 @@ function App() {
                 <FontAwesomeIcon icon={faCaretDown} />
               </div>
 
-              {/* Dropdown Menu */}
+              {/* dropdown */}
               {showUserMenu && (
                 <div className="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-lg py-2 z-50">
                   <button 
@@ -141,6 +144,13 @@ function App() {
                   >
                     <FontAwesomeIcon icon={faCog} />
                     <span>Quản lý sân</span>
+                  </button>
+                  <button 
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                    onClick={() => setShowIncomingOrders(true)}
+                  >
+                    <FontAwesomeIcon icon={faClipboardList} />
+                    <span>Đơn đặt sân</span>
                   </button>
                   <hr className="my-2" />
                   <button 
@@ -213,6 +223,9 @@ function App() {
         )}
         {showPlaygroundManager && (
           <PlaygroundManager onClose={() => setShowPlaygroundManager(false)} />
+        )}
+        {showIncomingOrders && (
+          <IncomingOrders onClose={() => setShowIncomingOrders(false)} />
         )}
       </div>
     </div>
