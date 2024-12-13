@@ -89,6 +89,8 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
           </button>
         </form>
 
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+
         <p className="mt-4 text-center">
           {isLogin ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}
           <button

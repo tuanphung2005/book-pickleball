@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import { playgrounds } from './data/playgrounds'
 import { PlaygroundFilter } from './components/PlaygroundFilter'
 import { PlaygroundList } from './components/PlaygroundList'
 import { PlaygroundDetail } from './components/PlaygroundDetail'
@@ -13,7 +12,6 @@ import { IncomingOrders } from './components/IncomingOrders' // Add this import
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faRightFromBracket, 
-  faUser, 
   faPlus, 
   faCog,
   faCaretDown,
@@ -36,7 +34,6 @@ function App() {
   const [userName, setUserName] = useState('');
 
   const [playgrounds, setPlaygrounds] = useState<Playground[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Add new state
   const [showOrders, setShowOrders] = useState(false);
@@ -55,8 +52,6 @@ function App() {
         setPlaygrounds(data);
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
