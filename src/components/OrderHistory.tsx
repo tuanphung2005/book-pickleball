@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock, faCalendar, faBan } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faCalendar, faBan, faStar, faHourglassHalf, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 interface Booking {
   id: number;
@@ -10,6 +10,7 @@ interface Booking {
   timeStart: string;
   timeEnd: string;
   status: 'pending' | 'confirmed' | 'cancelled';
+  rated: boolean;
 }
 
 export const OrderHistory = () => {
@@ -58,6 +59,30 @@ export const OrderHistory = () => {
     }
   };
 
+  const handleRate = async (bookingId: number, playgroundId: number, rating: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/rating`, { // Update endpoint
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ rating, playgroundId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update rating');
+      }
+
+      // Refresh bookings to get updated rated status
+      fetchBookings();
+
+    } catch (err) {
+      console.error('Error rating playground:', err);
+    }
+  };
+
   useEffect(() => {
     fetchBookings();
   }, []);
@@ -83,24 +108,60 @@ export const OrderHistory = () => {
                   <FontAwesomeIcon icon={faClock} className="mr-2" />
                   {booking.timeStart} - {booking.timeEnd}
                 </p>
-                <span className={`
-                  inline-block px-2 py-1 rounded text-sm mt-2
-                  ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : ''}
-                  ${booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
-                  ${booking.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
-                `}>
-                  {booking.status === 'confirmed' && 'Đã xác nhận'}
-                  {booking.status === 'pending' && 'Đang chờ'}
-                  {booking.status === 'cancelled' && 'Đã hủy'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`
+                    inline-flex items-center px-2 py-1 rounded text-sm mt-2
+                    ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : ''}
+                    ${booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
+                    ${booking.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
+                  `}>
+                    <FontAwesomeIcon 
+                      icon={
+                        booking.status === 'confirmed' ? faCheckCircle :
+                        booking.status === 'pending' ? faHourglassHalf :
+                        faBan
+                      } 
+                      className="mr-2" 
+                    />
+                    {booking.status === 'confirmed' && 'Đã xác nhận'}
+                    {booking.status === 'pending' && 'Đang chờ'}
+                    {booking.status === 'cancelled' && 'Đã hủy'}
+                  </span>
+                  
+                  {booking.status === 'confirmed' && (
+                    <span className={`inline-flex items-center px-2 py-1 rounded text-sm mt-2 ${
+                      booking.rated ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      <FontAwesomeIcon icon={faStar} className="mr-1" />
+                      {booking.rated ? 'Đã đánh giá' : 'Chưa đánh giá'}
+                    </span>
+                  )}
+                </div>
+                
+                {booking.status === 'confirmed' && !booking.rated && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-600 mb-1">Đánh giá sân:</p>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => handleRate(booking.id, booking.playgroundId, star)}
+                          className="text-yellow-400 hover:text-yellow-500"
+                        >
+                          <FontAwesomeIcon icon={faStar} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               {booking.status === 'pending' && (
                 <button
                   onClick={() => handleCancel(booking.id)}
-                  className="text-red-600 hover:text-red-700 p-2"
+                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
                   title="Hủy đặt sân"
                 >
-                  <FontAwesomeIcon icon={faBan} className="text-xl" />
+                  Hủy đặt
                 </button>
               )}
             </div>

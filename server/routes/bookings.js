@@ -163,4 +163,25 @@ router.patch('/:id/confirm', auth, async (req, res) => {
   }
 });
 
+// Update playground rating and mark booking as rated
+router.patch('/:id/rating', auth, async (req, res) => {
+  try {
+    const { rating } = req.body;
+    await pool.execute(
+      'UPDATE playgrounds SET rating = ? WHERE id = ?',
+      [rating, req.params.id]
+    );
+    
+    // Mark booking as rated
+    await pool.execute(
+      'UPDATE bookings SET rated = TRUE WHERE id = ?',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Rating updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

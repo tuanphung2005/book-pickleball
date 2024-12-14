@@ -109,10 +109,10 @@ function App() {
   });
 
   return (
-    <div className="pb-16">
-      <div className="p-4">
+    <div className="pb-16 md:pb-0 md:pl-16 max-w-7xl mx-auto"> {/* Add max-width and center */}
+      <div className="p-4 md:p-8"> {/* Add responsive padding */}
         <div className='flex m-2 items-center'>
-          <h1 className="text-2xl font-bold mb-4">Tìm sân hoặc quận</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-4">Tìm sân hoặc quận</h1>
           {isLoggedIn ? (
             <div className="ml-auto flex items-center gap-2 relative" ref={menuRef}>
               <div 
@@ -168,7 +168,7 @@ function App() {
           )}
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 md:max-w-2xl mx-auto"> {/* Center search on larger screens */}
           <input
             type="text"
             placeholder="Tìm sân"
@@ -180,20 +180,26 @@ function App() {
         
         {!showOrders ? (
           <>
-            <PlaygroundFilter 
-              filterType={filterType} 
-              setFilterType={setFilterType}
-              rating={rating}
-              onRatingChange={handleRatingChange}
-              activeFilter={activeFilter}
-            />
-            <PlaygroundList 
-              playgrounds={sortedPlaygrounds} 
-              onPlaygroundClick={setSelectedPlayground}
-            />
+            <div className="md:max-w-2xl mx-auto"> {/* Center filters */}
+              <PlaygroundFilter 
+                filterType={filterType} 
+                setFilterType={setFilterType}
+                rating={rating}
+                onRatingChange={handleRatingChange}
+                activeFilter={activeFilter}
+              />
+            </div>
+            <div className="md:max-w-3xl mx-auto"> {/* Center and limit width of playground list */}
+              <PlaygroundList 
+                playgrounds={sortedPlaygrounds} 
+                onPlaygroundClick={setSelectedPlayground}
+              />
+            </div>
           </>
         ) : (
-          <OrderHistory />
+          <div className="md:max-w-3xl mx-auto"> {/* Center order history */}
+            <OrderHistory />
+          </div>
         )}
         
         <BottomBar 

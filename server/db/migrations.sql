@@ -28,3 +28,10 @@ CREATE TABLE bookings (
   FOREIGN KEY (playgroundId) REFERENCES playgrounds(id),
   FOREIGN KEY (userId) REFERENCES users(id)
 );
+
+ALTER TABLE playgrounds 
+MODIFY COLUMN imageUrl VARCHAR(500) NOT NULL 
+CHECK (LENGTH(imageUrl) <= 500);
+
+ALTER TABLE bookings 
+ADD COLUMN rated BOOLEAN DEFAULT FALSE;
