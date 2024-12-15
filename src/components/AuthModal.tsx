@@ -12,6 +12,8 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // Add phone state
+  const [phone, setPhone] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +21,10 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
     
     try {
       const endpoint = isLogin ? '/api/login' : '/api/register';
-      const body = isLogin ? { email, password } : { name, email, password };
+      // Include phone in registration body
+      const body = isLogin ? 
+        { email, password } : 
+        { name, email, password, phone };
       
       const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: 'POST',
@@ -34,7 +39,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
       }
   
       localStorage.setItem('token', data.token);
-      localStorage.setItem('userName', isLogin ? data.name : name);
+      localStorage.setItem('userName', data.name); // This will now work for both login and register
       onClose();
       window.location.reload();
     } catch (err) {
@@ -56,14 +61,26 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
         
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <input
-              type="text"
-              placeholder="Họ tên"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border p-2 w-full rounded-lg"
-              required
-            />
+            <>
+              <input
+                type="text"
+                placeholder="Họ tên"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="border p-2 w-full rounded-lg"
+                required
+              />
+              <input
+                type="tel"
+                placeholder="Số điện thoại"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                pattern="[0-9]{10}"
+                className="border p-2 w-full rounded-lg"
+                required
+                title="Vui lòng nhập số điện thoại 10 chữ số"
+              />
+            </>
           )}
           <input
             type="email"

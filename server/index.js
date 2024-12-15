@@ -17,16 +17,19 @@ app.use('/api/bookings', bookingRoutes);
 // Register endpoint
 app.post('/api/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     
     const [result] = await pool.execute(
-      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-      [name, email, hashedPassword]
+      'INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, phone]
     );
     
     const token = jwt.sign({ userId: result.insertId }, 'your-secret-key');
-    res.json({ token });
+    res.json({ 
+      token,
+      name // Add this to send back the user's name
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

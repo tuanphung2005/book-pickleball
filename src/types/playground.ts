@@ -1,8 +1,9 @@
 export interface Playground {
-    id: number;       // Add this line
+    id: number;
     name: string;
     type: 'football' | 'pickleball' | 'badminton' | 'basketball';
     address: string;
     rating: number;
     imageUrl: string;
+    ownerPhone: string; // Add this field
 }

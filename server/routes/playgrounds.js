@@ -6,7 +6,11 @@ const auth = require('../middleware/auth');
 // Get all playgrounds
 router.get('/', async (req, res) => {
   try {
-    const [playgrounds] = await pool.execute('SELECT * FROM playgrounds');
+    const [playgrounds] = await pool.execute(
+      `SELECT p.*, u.phone as ownerPhone 
+       FROM playgrounds p 
+       JOIN users u ON p.userId = u.id`
+    );
     res.json(playgrounds);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -127,6 +131,55 @@ router.delete('/:id', auth, async (req, res) => {
     );
 
     res.json({ message: 'Playground deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Report playground
+router.post('/:id/report', auth, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const playgroundId = req.params.id;
+
+    // Check if user already reported this playground
+    const [existing] = await pool.execute(
+      'SELECT * FROM playground_reports WHERE playgroundId = ? AND userId = ?',
+      [playgroundId, req.userId]
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Bạn đã báo cáo sân này rồi' });
+    }
+
+    // Add report
+    await pool.execute(
+      'INSERT INTO playground_reports (playgroundId, userId, reason) VALUES (?, ?, ?)',
+      [playgroundId, req.userId, reason]
+    );
+
+    // Increment reports count and check threshold
+    const [result] = await pool.execute(
+      `UPDATE playgrounds 
+       SET reports = reports + 1 
+       WHERE id = ?`,
+      [playgroundId]
+    );
+
+    // Check if playground should be removed
+    const [playground] = await pool.execute(
+      'SELECT reports FROM playgrounds WHERE id = ?',
+      [playgroundId]
+    );
+
+    if (playground[0].reports >= 5) {
+      await pool.execute(
+        'UPDATE playgrounds SET isActive = FALSE WHERE id = ?',
+        [playgroundId]
+      );
+    }
+
+    res.json({ message: 'Report submitted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
