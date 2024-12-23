@@ -25,7 +25,7 @@ app.post('/api/register', async (req, res) => {
       [name, email, hashedPassword, phone]
     );
     
-    const token = jwt.sign({ userId: result.insertId }, 'your-secret-key');
+    const token = jwt.sign({ userId: result.insertId }, process.env.JWT_SECRET);
     res.json({ 
       token,
       name // Add this to send back the user's name
@@ -55,7 +55,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ userId: user.id }, 'your-secret-key');
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET); // Fix this line
     res.json({ 
       token,
       name: user.name
