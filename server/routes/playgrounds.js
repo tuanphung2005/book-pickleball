@@ -33,7 +33,7 @@ router.get('/user', auth, async (req, res) => {
 // Add new playground (protected route)
 router.post('/', auth, async (req, res) => {
   try {
-    const { name, type, address, imageUrl } = req.body;
+    const { name, type, address, imageUrl, description } = req.body;
 
     // Validate URL length
     if (imageUrl.length > 500) {
@@ -52,8 +52,8 @@ router.post('/', auth, async (req, res) => {
     }
 
     const [result] = await pool.execute(
-      'INSERT INTO playgrounds (name, type, address, imageUrl, userId) VALUES (?, ?, ?, ?, ?)',
-      [name, type, address, imageUrl, req.userId]
+      'INSERT INTO playgrounds (name, type, address, imageUrl, description, userId) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, type, address, imageUrl, description, req.userId]
     );
 
     res.status(201).json({ 
@@ -61,7 +61,8 @@ router.post('/', auth, async (req, res) => {
       name, 
       type, 
       address, 
-      imageUrl 
+      imageUrl,
+      description 
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -72,10 +73,27 @@ router.post('/', auth, async (req, res) => {
 router.patch('/:id/rating', auth, async (req, res) => {
   try {
     const { rating } = req.body;
+    
+    // Get current total ratings and count
+    const [ratingResult] = await pool.execute(
+      'SELECT AVG(rating) as avgRating FROM bookings WHERE playgroundId = ? AND rated = TRUE AND rating IS NOT NULL',
+      [req.params.id]
+    );
+
+    const avgRating = ratingResult[0].avgRating || 0;
+
+    // Update playground with average rating
     await pool.execute(
       'UPDATE playgrounds SET rating = ? WHERE id = ?',
-      [rating, req.params.id]
+      [avgRating, req.params.id]
     );
+    
+    // Update the booking's rating
+    await pool.execute(
+      'UPDATE bookings SET rated = TRUE, rating = ? WHERE id = ?',
+      [rating, req.body.bookingId]
+    );
+
     res.json({ message: 'Rating updated successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -85,7 +103,7 @@ router.patch('/:id/rating', auth, async (req, res) => {
 // Update playground
 router.patch('/:id', auth, async (req, res) => {
   try {
-    const { name, type, address, imageUrl } = req.body;
+    const { name, type, address, imageUrl, description } = req.body;
     
     // Check if playground belongs to user
     const [playground] = await pool.execute(
@@ -98,13 +116,13 @@ router.patch('/:id', auth, async (req, res) => {
     }
 
     await pool.execute(
-      'UPDATE playgrounds SET name = ?, type = ?, address = ?, imageUrl = ? WHERE id = ? AND userId = ?',
-      [name, type, address, imageUrl, req.params.id, req.userId]
+      'UPDATE playgrounds SET name = ?, type = ?, address = ?, imageUrl = ?, description = ? WHERE id = ? AND userId = ?',
+      [name, type, address, imageUrl, description, req.params.id, req.userId]
     );
     
     res.json({ 
       message: 'Playground updated successfully',
-      playground: { id: req.params.id, name, type, address, imageUrl }
+      playground: { id: req.params.id, name, type, address, imageUrl, description }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

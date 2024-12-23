@@ -62,13 +62,17 @@ export const OrderHistory = () => {
   const handleRate = async (bookingId: number, playgroundId: number, rating: number) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/rating`, { // Update endpoint
+      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/rating`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ rating, playgroundId })
+        body: JSON.stringify({ 
+          rating, 
+          playgroundId,
+          bookingId 
+        })
       });
 
       if (!response.ok) {

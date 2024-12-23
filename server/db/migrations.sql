@@ -52,3 +52,9 @@ CREATE TABLE playground_reports (
 
 ALTER TABLE users 
 ADD COLUMN phone VARCHAR(10) NOT NULL;
+
+ALTER TABLE bookings 
+ADD COLUMN rating INT DEFAULT NULL;
+
+ALTER TABLE playgrounds 
+ADD COLUMN description TEXT;

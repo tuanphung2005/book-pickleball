@@ -5,5 +5,6 @@ export interface Playground {
     address: string;
     rating: number;
     imageUrl: string;
-    ownerPhone: string; // Add this field
+    ownerPhone: string;
+    description: string;
 }

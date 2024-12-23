@@ -127,6 +127,15 @@ export const PlaygroundDetail = ({ playground, onClose, isLoggedIn }: Playground
                 {playground.rating}
               </p>
 
+              {playground.description && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-2">Mô tả</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {playground.description}
+                  </p>
+                </div>
+              )}
+
               <div className="flex justify-between items-center mt-4">
                 <button
                   onClick={handleBooking}

@@ -10,6 +10,7 @@ interface PlaygroundFormProps {
     type: 'football' | 'pickleball' | 'badminton' | 'basketball';
     address: string;
     imageUrl: string;
+    description?: string;
   };
 }
 
@@ -18,6 +19,7 @@ export const PlaygroundForm = ({ onClose, editPlayground }: PlaygroundFormProps)
   const [type, setType] = useState(editPlayground?.type || 'football');
   const [address, setAddress] = useState(editPlayground?.address || '');
   const [imageUrl, setImageUrl] = useState(editPlayground?.imageUrl || '');
+  const [description, setDescription] = useState(editPlayground?.description || '');
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +42,8 @@ export const PlaygroundForm = ({ onClose, editPlayground }: PlaygroundFormProps)
           name,
           type,
           address,
-          imageUrl
+          imageUrl,
+          description
         })
       });
 
@@ -122,6 +125,16 @@ export const PlaygroundForm = ({ onClose, editPlayground }: PlaygroundFormProps)
               onChange={(e) => setImageUrl(e.target.value)}
               className="border p-2 w-full rounded-lg"
               required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Mô tả</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="border p-2 w-full rounded-lg h-32"
+              placeholder="Mô tả về sân (trang thiết bị, tiện nghi...)"
             />
           </div>
 
