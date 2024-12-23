@@ -45,17 +45,17 @@ app.post('/api/login', async (req, res) => {
     );
 
     if (users.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Tài khoản hoặc mật khẩu sai' });
     }
 
     const user = users[0];
     const validPassword = await bcrypt.compare(password, user.password);
     
     if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Tài khoản hoặc mật khẩu sai' });
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET); // Fix this line
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
     res.json({ 
       token,
       name: user.name
