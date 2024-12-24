@@ -111,8 +111,8 @@ function App() {
   });
 
   return (
-    <div className="pb-16 md:pb-0 md:pl-16 max-w-7xl mx-auto"> {/* Add max-width and center */}
-      <div className="p-4 md:p-8"> {/* Add responsive padding */}
+    <div className="pb-16 md:pb-0 md:pl-16 max-w-7xl mx-auto">
+      <div className="p-4 md:p-8">
         <div className='flex m-2 items-center'>
           <h1 className="text-2xl md:text-3xl font-bold mb-4">Tìm sân hoặc quận</h1>
           {isLoggedIn ? (
@@ -170,7 +170,7 @@ function App() {
           )}
         </div>
 
-        <div className="mb-4 md:max-w-2xl mx-auto"> {/* Center search on larger screens */}
+        <div className="mb-4 md:max-w-2xl mx-auto">
           <input
             type="text"
             placeholder="Tìm sân"
@@ -182,7 +182,7 @@ function App() {
         
         {!showOrders ? (
           <>
-            <div className="md:max-w-2xl mx-auto"> {/* Center filters */}
+            <div className="md:max-w-2xl mx-auto">
               <PlaygroundFilter 
                 filterType={filterType} 
                 setFilterType={setFilterType}
@@ -191,7 +191,7 @@ function App() {
                 activeFilter={activeFilter}
               />
             </div>
-            <div className="md:max-w-3xl mx-auto"> {/* Center and limit width of playground list */}
+            <div className="md:max-w-3xl mx-auto">
               <PlaygroundList 
                 playgrounds={sortedPlaygrounds} 
                 onPlaygroundClick={setSelectedPlayground}
@@ -199,7 +199,7 @@ function App() {
             </div>
           </>
         ) : (
-          <div className="md:max-w-3xl mx-auto"> {/* Center order history */}
+          <div className="md:max-w-3xl mx-auto">
             <OrderHistory />
           </div>
         )}

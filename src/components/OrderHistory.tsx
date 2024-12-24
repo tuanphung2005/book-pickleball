@@ -64,28 +64,29 @@ export const OrderHistory = () => {
   const handleRate = async (bookingId: number, playgroundId: number, rating: number) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/rating`, {
+      const response = await fetch(`${API_BASE_URL}/api/playgrounds/${playgroundId}/rating`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-          rating, 
-          playgroundId,
-          bookingId 
+          rating,
+          bookingId // Add this to identify which booking is being rated
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update rating');
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update rating');
       }
 
-      // Refresh bookings to get updated rated status
+      // Refresh bookings to show updated rating status
       fetchBookings();
 
     } catch (err) {
       console.error('Error rating playground:', err);
+      alert('Không thể đánh giá sân. Vui lòng thử lại sau.');
     }
   };
 

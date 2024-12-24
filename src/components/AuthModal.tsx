@@ -22,7 +22,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
     
     try {
       const endpoint = isLogin ? '/api/login' : '/api/register';
-      // Include phone in registration body
+
       const body = isLogin ? 
         { email, password } : 
         { name, email, password, phone };
@@ -33,14 +33,14 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
         body: JSON.stringify(body)
       });
   
-      const data = await response.json(); // Only parse JSON once
+      const data = await response.json();
   
       if (!response.ok) {
         throw new Error(data.error);
       }
   
       localStorage.setItem('token', data.token);
-      localStorage.setItem('userName', data.name); // This will now work for both login and register
+      localStorage.setItem('userName', data.name);
       onClose();
       window.location.reload();
     } catch (err) {

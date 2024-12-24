@@ -39,20 +39,30 @@ export const IncomingOrders = ({ onClose }: { onClose: () => void }) => {
   const handleConfirm = async (bookingId: number) => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại');
+        return;
+      }
+  
       const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/confirm`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-
+  
+      const data = await response.json();
+  
       if (!response.ok) {
-        throw new Error('Failed to confirm booking');
+        throw new Error(data.error || 'Không thể xác nhận đơn đặt sân');
       }
-
+  
+      alert('Đã xác nhận đơn đặt sân thành công');
       fetchIncomingBookings();
     } catch (err) {
       console.error('Error confirming booking:', err);
+      alert('Không thể xác nhận đơn đặt sân. Vui lòng thử lại sau.');
     }
   };
 

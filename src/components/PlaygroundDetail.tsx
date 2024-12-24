@@ -122,7 +122,6 @@ export const PlaygroundDetail = ({ playground, onClose, isLoggedIn }: Playground
                 </button>
               </div>
 
-              {/* Add phone number display */}
               <p className="flex items-center text-gray-700">
                 <FontAwesomeIcon icon={faPhone} className="mr-2" />
                 {playground.ownerPhone}
