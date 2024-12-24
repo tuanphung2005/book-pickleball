@@ -4,6 +4,9 @@ import { faTimes, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Playground } from '../types/playground';
 import { PlaygroundForm } from './PlaygroundForm';
 
+
+import { API_BASE_URL } from '../config';
+
 interface PlaygroundManagerProps {
   onClose: () => void;
 }
@@ -20,7 +23,7 @@ export const PlaygroundManager = ({ onClose }: PlaygroundManagerProps) => {
   const fetchPlaygrounds = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/playgrounds/user', {
+      const response = await fetch(`${API_BASE_URL}/api/playgrounds/user`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -41,7 +44,7 @@ export const PlaygroundManager = ({ onClose }: PlaygroundManagerProps) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/playgrounds/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/playgrounds/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

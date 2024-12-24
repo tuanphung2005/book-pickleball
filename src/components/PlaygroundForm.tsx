@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
+import { API_BASE_URL } from '../config';
+
 interface PlaygroundFormProps {
   onClose: () => void;
   editPlayground?: {
@@ -29,8 +31,8 @@ export const PlaygroundForm = ({ onClose, editPlayground }: PlaygroundFormProps)
     try {
       const token = localStorage.getItem('token');
       const url = editPlayground 
-        ? `http://localhost:5000/api/playgrounds/${editPlayground.id}`
-        : 'http://localhost:5000/api/playgrounds';
+        ? `${API_BASE_URL}/api/playgrounds/${editPlayground.id}`
+        : `${API_BASE_URL}/api/playgrounds`;
 
       const response = await fetch(url, {
         method: editPlayground ? 'PATCH' : 'POST',

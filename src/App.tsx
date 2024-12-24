@@ -7,7 +7,9 @@ import { AuthModal } from './components/AuthModal'
 import { OrderHistory } from './components/OrderHistory'
 import { PlaygroundForm } from './components/PlaygroundForm'
 import { PlaygroundManager } from './components/PlaygroundManager'
-import { IncomingOrders } from './components/IncomingOrders' // Add this import
+import { IncomingOrders } from './components/IncomingOrders'
+
+import { API_BASE_URL } from './config'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -47,7 +49,7 @@ function App() {
   useEffect(() => {
     const fetchPlaygrounds = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/playgrounds');
+        const response = await fetch(`${API_BASE_URL}/api/playgrounds`);
         const data = await response.json();
         setPlaygrounds(data);
       } catch (err) {

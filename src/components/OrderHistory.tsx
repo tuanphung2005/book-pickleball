@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faCalendar, faBan, faStar, faHourglassHalf, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
+
+import { API_BASE_URL } from '../config';
 interface Booking {
   id: number;
   playgroundId: number;
@@ -20,7 +22,7 @@ export const OrderHistory = () => {
   const fetchBookings = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -41,7 +43,7 @@ export const OrderHistory = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/cancel`, {
+      const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/cancel`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -62,7 +64,7 @@ export const OrderHistory = () => {
   const handleRate = async (bookingId: number, playgroundId: number, rating: number) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/rating`, {
+      const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/rating`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

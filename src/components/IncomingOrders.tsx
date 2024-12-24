@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faCalendar, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
+import { API_BASE_URL } from '../config';
+
 interface IncomingBooking {
   id: number;
   playgroundId: number;
@@ -20,7 +22,7 @@ export const IncomingOrders = ({ onClose }: { onClose: () => void }) => {
   const fetchIncomingBookings = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/bookings/incoming', {
+      const response = await fetch(`${API_BASE_URL}/api/bookings/incoming`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -37,7 +39,7 @@ export const IncomingOrders = ({ onClose }: { onClose: () => void }) => {
   const handleConfirm = async (bookingId: number) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/confirm`, {
+      const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/confirm`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -61,7 +63,7 @@ export const IncomingOrders = ({ onClose }: { onClose: () => void }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/reject`, {
+      const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/reject`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`

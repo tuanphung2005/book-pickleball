@@ -4,6 +4,8 @@ import { Playground } from '../types/playground';
 import { useState } from 'react';
 import BookingForm from './BookingForm';
 
+import { API_BASE_URL } from '../config';
+
 interface PlaygroundDetailProps {
   playground: Playground;
   onClose: () => void;
@@ -47,7 +49,7 @@ export const PlaygroundDetail = ({ playground, onClose, isLoggedIn }: Playground
   const submitReport = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/playgrounds/${playground.id}/report`, {
+      const response = await fetch(`${API_BASE_URL}/api/playgrounds/${playground.id}/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faClock, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { Playground } from '../types/playground';
 
+import { API_BASE_URL } from '../config';
+
 interface BookingFormProps {
   playground: Playground;
   onClose: () => void;
@@ -17,7 +19,7 @@ export const BookingForm = ({ playground, onClose }: BookingFormProps) => {
     const checkOwnership = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/playgrounds/${playground.id}/owner`, {
+        const response = await fetch(`${API_BASE_URL}/api/playgrounds/${playground.id}/owner`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -46,7 +48,7 @@ export const BookingForm = ({ playground, onClose }: BookingFormProps) => {
     try {
       const timeEnd = `${Number(timeStart.split(':')[0]) + 1}:00`; // Calculate end time
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
