@@ -9,7 +9,7 @@ import { API_BASE_URL } from '../config';
 interface PlaygroundDetailProps {
   playground: Playground;
   onClose: () => void;
-  isLoggedIn?: boolean; // Add this prop to check login status
+  isLoggedIn?: boolean;
 }
 
 export const PlaygroundDetail = ({ playground, onClose, isLoggedIn }: PlaygroundDetailProps) => {
@@ -83,9 +83,13 @@ export const PlaygroundDetail = ({ playground, onClose, isLoggedIn }: Playground
         <div className="bg-white rounded-lg max-w-2xl w-full relative">
           <button 
             onClick={onClose}
-            className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+            className="absolute right-4 top-4 z-10 bg-red-400 px-1.5 py-1 rounded-full shadow-md"
+            aria-label="Close"
           >
-            <FontAwesomeIcon icon={faTimes} />
+            <FontAwesomeIcon 
+              icon={faTimes} 
+              className="text-white text-xl"
+            />
           </button>
           
           <div className="p-6">
