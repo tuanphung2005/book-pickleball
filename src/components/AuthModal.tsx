@@ -13,7 +13,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  // Add phone state
+
   const [phone, setPhone] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {

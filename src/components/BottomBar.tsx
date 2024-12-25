@@ -5,7 +5,7 @@ interface BottomBarProps {
   onHomeClick: () => void;
   onOrdersClick: () => void;
   activeTab: 'home' | 'orders';
-  isLoggedIn: boolean; // Add this prop
+  isLoggedIn: boolean;
 }
 
 export const BottomBar = ({ onHomeClick, onOrdersClick, activeTab, isLoggedIn }: BottomBarProps) => {

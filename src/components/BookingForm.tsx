@@ -46,7 +46,7 @@ export const BookingForm = ({ playground, onClose }: BookingFormProps) => {
     }
 
     try {
-      const timeEnd = `${Number(timeStart.split(':')[0]) + 1}:00`; // Calculate end time
+      const timeEnd = `${Number(timeStart.split(':')[0]) + 1}:00`;
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
