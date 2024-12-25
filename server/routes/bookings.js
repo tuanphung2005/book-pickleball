@@ -168,13 +168,11 @@ router.patch('/:id/rating', auth, async (req, res) => {
   try {
     const { rating, bookingId } = req.body;
     
-    // Update the booking's rating first
     await pool.execute(
       'UPDATE bookings SET rated = TRUE, rating = ? WHERE id = ?',
       [rating, bookingId]
     );
 
-    // Then calculate and update playground's average rating
     const [ratingResult] = await pool.execute(
       'SELECT AVG(rating) as avgRating FROM bookings WHERE playgroundId = ? AND rated = TRUE AND rating IS NOT NULL',
       [req.params.id]
@@ -182,7 +180,6 @@ router.patch('/:id/rating', auth, async (req, res) => {
 
     const avgRating = ratingResult[0].avgRating || 0;
 
-    // Update playground rating
     await pool.execute(
       'UPDATE playgrounds SET rating = ? WHERE id = ?',
       [avgRating, req.params.id]

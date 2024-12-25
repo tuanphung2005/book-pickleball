@@ -54,7 +54,7 @@ export const OrderHistory = () => {
         throw new Error('Failed to cancel booking');
       }
 
-      // Refresh bookings after cancellation
+
       fetchBookings();
     } catch (err) {
       console.error('Error cancelling booking:', err);
@@ -72,7 +72,7 @@ export const OrderHistory = () => {
         },
         body: JSON.stringify({ 
           rating,
-          bookingId // Add this to identify which booking is being rated
+          bookingId
         })
       });
 
