@@ -69,9 +69,9 @@ router.post('/', auth, async (req, res) => {
        AND date = ? 
        AND status != 'cancelled'
        AND (
-         (timeStart < ? AND timeEnd > ?) OR    /* New booking starts during existing */
-         (timeStart < ? AND timeEnd > ?) OR    /* New booking ends during existing */
-         (timeStart >= ? AND timeEnd <= ?)     /* Existing booking completely contains new */
+         (timeStart < ? AND timeEnd > ?) OR
+         (timeStart < ? AND timeEnd > ?) OR
+         (timeStart >= ? AND timeEnd <= ?)
        )`,
       [
         playgroundId, 
